@@ -1,0 +1,252 @@
+/* Variáveis de cores - Tema Claro */
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #2ecc71;
+    --danger-color: #e74c3c;
+    --warning-color: #f1c40f;
+    --text-color: #2c3e50;
+    --background-color: #f5f6fa;
+    --surface-color: #ffffff;
+    --border-color: #dcdde1;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Variáveis de cores - Tema Escuro */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --primary-color: #4ea6e8;
+        --secondary-color: #42d885;
+        --danger-color: #eb6b5e;
+        --warning-color: #f4d03f;
+        --text-color: #ecf0f1;
+        --background-color: #1a1a1a;
+        --surface-color: #2d2d2d;
+        --border-color: #404040;
+        --shadow-color: rgba(0, 0, 0, 0.3);
+    }
+}
+
+/* Estilos Gerais */
+* {
+    transition: background-color 0.3s, color 0.3s;
+}
+
+window {
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+/* Header e Navegação */
+.header-bar {
+    background-color: var(--surface-color);
+    border-bottom: 1px solid var(--border-color);
+    padding: 8px;
+    box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+.sidebar {
+    background-color: var(--surface-color);
+    border-right: 1px solid var(--border-color);
+    padding: 16px;
+    min-width: 250px;
+}
+
+.nav-button {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 4px 0;
+    transition: all 0.3s;
+}
+
+.nav-button:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* Cards e Containers */
+.card {
+    background-color: var(--surface-color);
+    border-radius: 12px;
+    padding: 16px;
+    margin: 8px;
+    box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+/* Botões */
+button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+button:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+button.secondary {
+    background-color: var(--secondary-color);
+}
+
+button.danger {
+    background-color: var(--danger-color);
+}
+
+/* Campos de Entrada */
+entry {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px;
+    color: var(--text-color);
+}
+
+entry:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+/* TreeView Moderna */
+treeview {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+treeview header button {
+    background-color: var(--surface-color);
+    color: var(--text-color);
+    font-weight: 600;
+    padding: 12px;
+}
+
+treeview:selected {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* Slider Moderno */
+scale {
+    margin: 16px 0;
+}
+
+scale trough {
+    background-color: var(--border-color);
+    border-radius: 12px;
+    min-height: 6px;
+}
+
+scale highlight {
+    background-color: var(--primary-color);
+    border-radius: 12px;
+}
+
+scale slider {
+    background-color: white;
+    border: 2px solid var(--primary-color);
+    border-radius: 50%;
+    min-width: 20px;
+    min-height: 20px;
+    box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+/* Diálogos */
+dialog {
+    background-color: var(--surface-color);
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px var(--shadow-color);
+}
+
+dialog headerbar {
+    background-color: var(--surface-color);
+    color: var(--text-color);
+    border-bottom: 1px solid var(--border-color);
+    padding: 16px;
+}
+
+/* Labels e Textos */
+label {
+    color: var(--text-color);
+}
+
+.title {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 16px 0;
+}
+
+.subtitle {
+    font-size: 16px;
+    color: alpha(var(--text-color), 0.8);
+}
+
+/* Notificações e Alertas */
+infobar {
+    border-radius: 8px;
+    margin: 8px;
+}
+
+infobar.info {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+infobar.success {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+infobar.warning {
+    background-color: var(--warning-color);
+    color: white;
+}
+
+infobar.error {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+/* Animações */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Tooltips */
+tooltip {
+    background-color: var(--surface-color);
+    color: var(--text-color);
+    border-radius: 4px;
+    padding: 8px;
+    box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+/* Scrollbars */
+scrollbar {
+    background-color: transparent;
+}
+
+scrollbar slider {
+    background-color: alpha(var(--text-color), 0.2);
+    border-radius: 10px;
+    min-width: 8px;
+    min-height: 8px;
+}
+
+scrollbar slider:hover {
+    background-color: alpha(var(--text-color), 0.4);
+}
