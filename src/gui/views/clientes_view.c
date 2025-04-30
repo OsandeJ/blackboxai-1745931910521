@@ -141,13 +141,16 @@ void mostrar_dialogo_cliente(const char *titulo, Cliente *cliente, gboolean edit
                           editando ? cliente->telefone : NULL);
     
     // Botões de ação
-    custom_dialog_add_action_button(dialog, "Cancelar", "window-close-symbolic",
-                                  G_CALLBACK(custom_dialog_destroy), dialog);
-    
-    GtkWidget *btn_salvar = custom_button_new_with_icon("Salvar",
-                                                       "document-save-symbolic",
-                                                       BUTTON_STYLE_SUCCESS);
-    g_signal_connect(btn_salvar, "clicked", G_CALLBACK(custom_dialog_destroy), dialog);
+    // Add response buttons with proper callbacks
+    GtkWidget *btn_cancelar = custom_button_new_with_icon("Cancelar", "window-close-symbolic", BUTTON_STYLE_DANGER);
+    g_signal_connect_swapped(btn_cancelar, "clicked", G_CALLBACK(gtk_dialog_response), dialog->dialog);
+    g_object_set_data(G_OBJECT(btn_cancelar), "response-id", GINT_TO_POINTER(GTK_RESPONSE_CANCEL));
+    gtk_container_add(GTK_CONTAINER(dialog->action_area), btn_cancelar);
+
+    GtkWidget *btn_salvar = custom_button_new_with_icon("Salvar", "document-save-symbolic", BUTTON_STYLE_SUCCESS);
+    g_signal_connect_swapped(btn_salvar, "clicked", G_CALLBACK(gtk_dialog_response), dialog->dialog);
+    g_object_set_data(G_OBJECT(btn_salvar), "response-id", GINT_TO_POINTER(GTK_RESPONSE_ACCEPT));
+    gtk_container_add(GTK_CONTAINER(dialog->action_area), btn_salvar);
     
     gtk_widget_show_all(dialog->dialog);
     

@@ -49,17 +49,7 @@ CustomHeader* custom_header_new(const char *title, const char *subtitle) {
     gtk_widget_set_halign(header->actions_box, GTK_ALIGN_END);
     gtk_widget_set_hexpand(header->actions_box, TRUE);
     
-    // Switch para tema claro/escuro
-    GtkWidget *theme_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 4);
-    GtkWidget *theme_icon = gtk_image_new_from_icon_name("weather-clear-night-symbolic", GTK_ICON_SIZE_SMALL_TOOLBAR);
-    header->theme_switch = gtk_switch_new();
-    
-    gtk_box_pack_start(GTK_BOX(theme_box), theme_icon, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(theme_box), header->theme_switch, FALSE, FALSE, 0);
-    gtk_box_pack_end(GTK_BOX(header->actions_box), theme_box, FALSE, FALSE, 0);
-    
-    g_signal_connect(header->theme_switch, "notify::active",
-                    G_CALLBACK(on_theme_switch_toggled), NULL);
+    // Container para ações (botões)
     
     // Montar layout final
     gtk_box_pack_start(GTK_BOX(header_box), title_area, TRUE, TRUE, 0);
@@ -101,6 +91,10 @@ void custom_header_set_title(CustomHeader *header, const char *title) {
 
 void custom_header_set_subtitle(CustomHeader *header, const char *subtitle) {
     gtk_label_set_text(GTK_LABEL(header->subtitle), subtitle);
+}
+
+void custom_header_add_widget(CustomHeader *header, GtkWidget *widget) {
+    gtk_box_pack_end(GTK_BOX(header->actions_box), widget, FALSE, FALSE, 0);
 }
 
 GtkWidget* custom_header_get_widget(CustomHeader *header) {

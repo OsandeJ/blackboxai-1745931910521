@@ -562,4 +562,98 @@ void mostrar_dialogo_novo_pedido() {
     for (int i = 0; i < numClientes; i++) {
         gtk_combo_box_text_append_text(
             GTK_COMBO_BOX_TEXT(pedidos_view.novo_pedido.cliente_combo),
-            clientes[i].nome
+            clientes[i].nome);
+    }
+    gtk_combo_box_set_active(GTK_COMBO_BOX(pedidos_view.novo_pedido.cliente_combo), 0);
+    
+    GtkWidget *produtos_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 8);
+    
+    pedidos_view.novo_pedido.produtos_store = gtk_list_store_new(NUM_COLS_ITEM,
+                                                                G_TYPE_INT,
+                                                                G_TYPE_STRING,
+                                                                G_TYPE_INT,
+                                                                G_TYPE_FLOAT,
+                                                                G_TYPE_FLOAT,
+                                                                G_TYPE_FLOAT,
+                                                                G_TYPE_FLOAT);
+    
+    pedidos_view.novo_pedido.produtos_tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(pedidos_view.novo_pedido.produtos_store));
+    
+    // Configurar colunas da lista de produtos no pedido
+    GtkCellRenderer *renderer;
+    GtkTreeViewColumn *column;
+    
+    renderer = gtk_cell_renderer_text_new();
+    column = gtk_tree_view_column_new_with_attributes("Produto", renderer, "text", COL_ITEM_NOME, NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(pedidos_view.novo_pedido.produtos_tree), column);
+    
+    renderer = gtk_cell_renderer_text_new();
+    column = gtk_tree_view_column_new_with_attributes("Quantidade", renderer, "text", COL_ITEM_QUANTIDADE, NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(pedidos_view.novo_pedido.produtos_tree), column);
+    
+    renderer = gtk_cell_renderer_text_new();
+    column = gtk_tree_view_column_new_with_attributes("Preço Unit.", renderer, "text", COL_ITEM_PRECO_UNIT, NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(pedidos_view.novo_pedido.produtos_tree), column);
+    
+    renderer = gtk_cell_renderer_text_new();
+    column = gtk_tree_view_column_new_with_attributes("Subtotal", renderer, "text", COL_ITEM_SUBTOTAL, NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(pedidos_view.novo_pedido.produtos_tree), column);
+    
+    renderer = gtk_cell_renderer_text_new();
+    column = gtk_tree_view_column_new_with_attributes("IVA", renderer, "text", COL_ITEM_IVA, NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(pedidos_view.novo_pedido.produtos_tree), column);
+    
+    renderer = gtk_cell_renderer_text_new();
+    column = gtk_tree_view_column_new_with_attributes("Total", renderer, "text", COL_ITEM_TOTAL, NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(pedidos_view.novo_pedido.produtos_tree), column);
+    
+    GtkWidget *scroll = gtk_scrolled_window_new(NULL, NULL);
+    gtk_container_add(GTK_CONTAINER(scroll), pedidos_view.novo_pedido.produtos_tree);
+    gtk_widget_set_size_request(scroll, -1, 200);
+    
+    gtk_box_pack_start(GTK_BOX(produtos_box), scroll, TRUE, TRUE, 0);
+    
+    // Valor pago
+    GtkWidget *valor_pago_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 8);
+    GtkWidget *valor_pago_label = gtk_label_new("Valor Pago:");
+    pedidos_view.novo_pedido.valor_pago_entry = gtk_entry_new();
+    gtk_entry_set_text(GTK_ENTRY(pedidos_view.novo_pedido.valor_pago_entry), "0.00");
+    
+    gtk_box_pack_start(GTK_BOX(valor_pago_box), valor_pago_label, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(valor_pago_box), pedidos_view.novo_pedido.valor_pago_entry, TRUE, TRUE, 0);
+    
+    // Troco
+    pedidos_view.novo_pedido.troco_label = gtk_label_new("Troco: 0.00 Kz");
+    
+    // Método de pagamento
+    GtkWidget *metodo_pagamento_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 8);
+    GtkWidget *metodo_pagamento_label = gtk_label_new("Método de Pagamento:");
+    pedidos_view.novo_pedido.metodo_pagamento_combo = gtk_combo_box_text_new();
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(pedidos_view.novo_pedido.metodo_pagamento_combo), "Dinheiro");
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(pedidos_view.novo_pedido.metodo_pagamento_combo), "Cartão");
+    gtk_combo_box_set_active(GTK_COMBO_BOX(pedidos_view.novo_pedido.metodo_pagamento_combo), 0);
+    
+    gtk_box_pack_start(GTK_BOX(metodo_pagamento_box), metodo_pagamento_label, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(metodo_pagamento_box), pedidos_view.novo_pedido.metodo_pagamento_combo, TRUE, TRUE, 0);
+    
+    // Botões
+    GtkWidget *actions_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 8);
+    GtkWidget *btn_finalizar = custom_button_new_with_icon("Finalizar Pedido", "object-select-symbolic", BUTTON_STYLE_SUCCESS);
+    GtkWidget *btn_cancelar = custom_button_new_with_icon("Cancelar", "window-close-symbolic", BUTTON_STYLE_DANGER);
+    
+    g_signal_connect(btn_finalizar, "clicked", G_CALLBACK(on_finalizar_pedido), NULL);
+    g_signal_connect(btn_cancelar, "clicked", G_CALLBACK(gtk_widget_destroy), pedidos_view.novo_pedido.dialog);
+    
+    gtk_box_pack_end(GTK_BOX(actions_box), btn_cancelar, FALSE, FALSE, 0);
+    gtk_box_pack_end(GTK_BOX(actions_box), btn_finalizar, FALSE, FALSE, 0);
+    
+    // Adicionar widgets ao content_area
+    gtk_box_pack_start(GTK_BOX(content_area), cliente_box, FALSE, FALSE, 8);
+    gtk_box_pack_start(GTK_BOX(content_area), produtos_box, TRUE, TRUE, 8);
+    gtk_box_pack_start(GTK_BOX(content_area), valor_pago_box, FALSE, FALSE, 8);
+    gtk_box_pack_start(GTK_BOX(content_area), pedidos_view.novo_pedido.troco_label, FALSE, FALSE, 8);
+    gtk_box_pack_start(GTK_BOX(content_area), metodo_pagamento_box, FALSE, FALSE, 8);
+    gtk_box_pack_start(GTK_BOX(content_area), actions_box, FALSE, FALSE, 8);
+    
+    gtk_widget_show_all(pedidos_view.novo_pedido.dialog);
+}

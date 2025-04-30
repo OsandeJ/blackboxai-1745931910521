@@ -1,97 +1,106 @@
+# Sistema de Gestão
 
-Built by https://www.blackbox.ai
+Sistema de gestão moderno desenvolvido em C com interface gráfica GTK+3, adaptado para o mercado angolano.
 
----
+## Funcionalidades
 
-```markdown
-# Sistema de Gestão de Vendas
+- Gestão completa de produtos
+  - Cadastro, edição e exclusão de produtos
+  - Visualização em lista e grid
+  - Filtro dinâmico por preço (slider)
+  - Cálculo automático de IVA (14%)
+  - Exportação de dados
+  - Visualização de estatísticas
 
-## Project Overview
-O Sistema de Gestão de Vendas é um aplicativo desenvolvido em C que permite gerenciar produtos, clientes e pedidos de forma simplificada. O sistema contém funcionalidades para cadastrar, editar e excluir produtos e clientes, além de realizar pedidos e visualizar relatórios das transações realizadas.
+- Gestão de clientes
+  - Cadastro e manutenção de clientes
+  - Histórico de pedidos por cliente
+  - Formatação de telefone no padrão angolano
 
-## Installation
+- Gestão de pedidos
+  - Registro de pedidos
+  - Cálculo automático de valores
+  - Impressão de comprovantes
+  - Histórico de vendas
 
-### Requirements
-- GCC ou qualquer outro compilador C compatível
-- GTK+ 3.0 ou superior para a interface gráfica
+## Interface Moderna
 
-### Building the Project
-1. **Clone o repositório:**
-   ```bash
-   git clone <URL_DO_REPOSITORIO>
-   cd <PASTA_DO_PROJETO>
-   ```
+- Design responsivo e intuitivo
+- Temas claro e escuro
+- Animações suaves
+- Notificações toast
+- Ícones modernos
+- Validações em tempo real
 
-2. **Compile os arquivos:**
-   Se você estiver utilizando o GCC, pode compilar o projeto da seguinte maneira:
-   ```bash
-   gcc -o sistema_gestao main.c backend.c gui.c produtos_gui.c clientes_gui.c pedidos_gui.c -lgtk-3 -lgdk-3 -lgio-2.0
-   ```
+## Requisitos
 
-3. **Execute o projeto:**
-   ```bash
-   ./sistema_gestao
-   ```
+- Sistema operacional Linux
+- GTK+ 3.0 ou superior
+- GCC (GNU Compiler Collection)
+- Make
 
-## Usage
+## Instalação
 
-Ao abrir o sistema, você será apresentado a um menu principal onde poderá escolher entre as seguintes opções:
-- Cadastrar Produto
-- Cadastrar Cliente
-- Fazer Pedido
-- Visualizar Pedidos
-- Pesquisar Cliente por Nome
-- Listar Produtos
-- Sair
-
-Siga os prompts para interagir com as funcionalidades oferecidas.
-
-## Features
-- Cadastro e gerenciamento de produtos e clientes.
-- Realização de pedidos com registro detalhado.
-- Persistência de dados através do armazenamento em arquivos binários.
-- Interface gráfica utilizando GTK+ 3 para melhor usabilidade.
-- Visualização de pedidos e histórico de transações.
-
-## Dependencies
-O projeto utiliza as seguintes bibliotecas e pacotes:
-- `gtk-3`: Para a interface gráfica
-- `glib`: Para manipulação de strings e dados
-
-Instale as dependências no seu sistema com os seguintes comandos (para sistemas baseados em Debian):
+1. Instale as dependências:
 ```bash
-sudo apt-get install libgtk-3-dev
-sudo apt-get install build-essential
+make deps
 ```
 
-## Project Structure
+2. Configure o ambiente:
+```bash
+make setup
+```
+
+3. Compile o projeto:
+```bash
+make
+```
+
+4. Execute o sistema:
+```bash
+make run
+```
+
+## Estrutura do Projeto
 
 ```
-.
-├── src
-│   ├── gui
-│   │   ├── gui.c
-│   │   ├── produtos_gui.c
-│   │   ├── clientes_gui.c
-│   │   └── pedidos_gui.c
-│   ├── backend
+sistema-gestao/
+├── src/
+│   ├── backend/       # Lógica de negócios
 │   │   ├── backend.c
-│   └── main.c
-├── config.css
-├── Makefile (se aplicável)
-└── README.md
+│   │   └── backend.h
+│   └── gui/          # Interface gráfica
+│       ├── styles/   # Estilos CSS
+│       ├── views/    # Telas do sistema
+│       ├── widgets/  # Componentes reutilizáveis
+│       ├── gui.c
+│       └── gui.h
+├── main.c            # Ponto de entrada
+└── Makefile         # Script de compilação
 ```
 
-- **main.c**: Ponto de entrada da aplicação, onde a interface gráfica é inicializada e os dados são carregados.
-- **backend.c**: Contém as funções responsáveis pela manipulação de dados de produtos, clientes e pedidos.
-- **gui.c**: Contém a lógica e a criação da interface gráfica da aplicação.
-- **produtos_gui.c**, **clientes_gui.c**, **pedidos_gui.c**: Módulos para a interface gráfica de cada entidade, permitindo adicionar, editar e excluir informações.
+## Características Técnicas
 
-## Contributing
-Contribuições são bem-vindas! Sinta-se à vontade para abrir uma issue ou pull request no repositório.
+- Desenvolvido em C
+- Interface gráfica com GTK+3
+- Armazenamento em arquivos binários
+- Suporte a localização (pt_AO)
+- Moeda: Kwanza (Kz)
+- IVA: 14%
 
-## License
-Este projeto é licenciado sob a MIT License - veja o arquivo [LICENSE](LICENSE) para mais detalhes.
-```
+## Desenvolvimento
 
-**Note:** Replace `<URL_DO_REPOSITORIO>` with the actual repository URL if applicable. Make sure that the project details are accurately represented according to your specific project structure and requirements.
+Para contribuir com o projeto:
+
+1. Clone o repositório
+2. Crie uma branch para sua feature
+3. Faça suas alterações
+4. Envie um pull request
+
+## Licença
+
+Este projeto está sob a licença MIT.
+
+## Suporte
+
+Para suporte ou dúvidas, abra uma issue no repositório do projeto.

@@ -1,54 +1,71 @@
+# Compilador e flags
 CC = gcc
-CFLAGS = `pkg-config --cflags gtk+-3.0` -Wall -g
-LIBS = `pkg-config --libs gtk+-3.0`
+CFLAGS = -Wall -Wextra -g `pkg-config --cflags gtk+-3.0`
+LDFLAGS = `pkg-config --libs gtk+-3.0`
 
 # Diretórios
 SRC_DIR = src
 GUI_DIR = $(SRC_DIR)/gui
-WIDGETS_DIR = $(GUI_DIR)/widgets
-VIEWS_DIR = $(GUI_DIR)/views
 BACKEND_DIR = $(SRC_DIR)/backend
+BUILD_DIR = build
 
 # Arquivos fonte
 SOURCES = main.c \
+          $(BACKEND_DIR)/backend.c \
           $(GUI_DIR)/gui.c \
-          $(WIDGETS_DIR)/custom_header.c \
-          $(WIDGETS_DIR)/custom_button.c \
-          $(WIDGETS_DIR)/custom_dialog.c \
-          $(VIEWS_DIR)/produtos_view.c \
-          $(VIEWS_DIR)/clientes_view.c \
-          $(VIEWS_DIR)/pedidos_view.c \
-          $(BACKEND_DIR)/backend.c
+          $(GUI_DIR)/views/produtos_view.c \
+          $(GUI_DIR)/views/clientes_view.c \
+          $(GUI_DIR)/views/pedidos_view.c \
+          $(GUI_DIR)/widgets/custom_button.c \
+          $(GUI_DIR)/widgets/custom_dialog.c \
+          $(GUI_DIR)/widgets/custom_header.c
 
 # Objetos
-OBJECTS = $(SOURCES:.c=.o)
+OBJECTS = $(SOURCES:%.c=$(BUILD_DIR)/%.o)
 
 # Nome do executável
 TARGET = sistema_gestao
 
-all: $(TARGET)
+# Regras
+all: $(BUILD_DIR)/$(TARGET) copy-assets
 
-$(TARGET): $(OBJECTS)
-	$(CC) -o $(TARGET) $(OBJECTS) $(LIBS)
+copy-assets:
+	@mkdir -p $(BUILD_DIR)/src/gui/styles
+	cp $(SRC_DIR)/gui/styles/theme.css $(BUILD_DIR)/src/gui/styles/
 
-%.o: %.c
-	$(CC) -c $(CFLAGS) $< -o $@
+$(BUILD_DIR)/$(TARGET): $(OBJECTS)
+	@mkdir -p $(@D)
+	$(CC) $(OBJECTS) -o $@ $(LDFLAGS)
+
+$(BUILD_DIR)/%.o: %.c
+	@mkdir -p $(@D)
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJECTS) $(TARGET)
+	rm -rf $(BUILD_DIR)
 
-run: $(TARGET)
-	./$(TARGET)
+run: $(BUILD_DIR)/$(TARGET)
+	./$(BUILD_DIR)/$(TARGET)
 
-.PHONY: all clean run
+.PHONY: all clean run copy-assets
 
 # Dependências
-main.o: main.c $(GUI_DIR)/gui.h $(BACKEND_DIR)/backend.h
-$(GUI_DIR)/gui.o: $(GUI_DIR)/gui.c $(GUI_DIR)/gui.h $(WIDGETS_DIR)/custom_header.h $(WIDGETS_DIR)/custom_button.h $(WIDGETS_DIR)/custom_dialog.h
-$(WIDGETS_DIR)/custom_header.o: $(WIDGETS_DIR)/custom_header.c $(WIDGETS_DIR)/custom_header.h
-$(WIDGETS_DIR)/custom_button.o: $(WIDGETS_DIR)/custom_button.c $(WIDGETS_DIR)/custom_button.h
-$(WIDGETS_DIR)/custom_dialog.o: $(WIDGETS_DIR)/custom_dialog.c $(WIDGETS_DIR)/custom_dialog.h
-$(VIEWS_DIR)/produtos_view.o: $(VIEWS_DIR)/produtos_view.c $(VIEWS_DIR)/produtos_view.h
-$(VIEWS_DIR)/clientes_view.o: $(VIEWS_DIR)/clientes_view.c $(VIEWS_DIR)/clientes_view.h
-$(VIEWS_DIR)/pedidos_view.o: $(VIEWS_DIR)/pedidos_view.c $(VIEWS_DIR)/pedidos_view.h
-$(BACKEND_DIR)/backend.o: $(BACKEND_DIR)/backend.c $(BACKEND_DIR)/backend.h
+-include $(OBJECTS:.o=.d)
+
+# Gerar arquivos de dependência
+$(BUILD_DIR)/%.d: %.c
+	@mkdir -p $(@D)
+	@$(CC) $(CFLAGS) -MM -MT '$(@:.d=.o)' $< > $@
+
+# Instalar dependências (Ubuntu/Debian)
+deps:
+	sudo apt-get update
+	sudo apt-get install -y build-essential pkg-config libgtk-3-dev
+
+# Criar diretórios necessários
+setup:
+	mkdir -p $(BUILD_DIR)
+	mkdir -p $(BUILD_DIR)/$(SRC_DIR)
+	mkdir -p $(BUILD_DIR)/$(GUI_DIR)/views
+	mkdir -p $(BUILD_DIR)/$(GUI_DIR)/widgets
+	mkdir -p $(BUILD_DIR)/$(BACKEND_DIR)

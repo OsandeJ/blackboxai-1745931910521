@@ -2,53 +2,60 @@
 #define PRODUTOS_VIEW_H
 
 #include <gtk/gtk.h>
-#include "../widgets/custom_header.h"
-#include "../widgets/custom_button.h"
-#include "../widgets/custom_dialog.h"
 
-// Enumeração para as colunas da TreeView
+// Colunas da lista de produtos
 enum {
     COL_ID,
     COL_NOME,
     COL_DESCRICAO,
     COL_PRECO,
     COL_PRECO_IVA,
+    COL_CATEGORIA,  // Nova coluna
     NUM_COLS
 };
 
-// Estrutura para armazenar widgets da interface de produtos
+// Estrutura para a view de produtos
 typedef struct {
     GtkWidget *container;
-    GtkWidget *grid_view;
     GtkWidget *list_view;
-    GtkWidget *view_switcher;
+    GtkWidget *grid_view;
     GtkWidget *search_entry;
     GtkWidget *filter_box;
     GtkWidget *price_slider;
     GtkWidget *price_label;
+    GtkWidget *view_toggle;  // Botão para alternar entre lista/grid
+    GtkWidget *export_button; // Botão para exportar dados
+    GtkWidget *stats_button;  // Botão para visualizar estatísticas
     GtkListStore *store;
     GtkTreeModelFilter *filter;
     GtkTreeModelSort *sort;
+    float preco_maximo;
+    gboolean view_as_grid;  // Flag para controle de visualização
 } ProdutosView;
 
 // Funções principais
-GtkWidget* criar_tela_produtos(void);
-void atualizar_lista_produtos(void);
-void atualizar_grid_produtos(void);
-
-// Callbacks
-void on_view_switch(GtkToggleButton *button, gpointer user_data);
-void on_produto_activated(GtkListBox *box, GtkListBoxRow *row, gpointer user_data);
-void on_adicionar_produto(GtkButton *button, gpointer user_data);
-void on_editar_produto(GtkButton *button, gpointer user_data);
-void on_excluir_produto(GtkButton *button, gpointer user_data);
-void on_search_changed(GtkSearchEntry *entry, gpointer user_data);
-void on_price_filter_changed(GtkRange *range, gpointer user_data);
+GtkWidget* criar_tela_produtos();
+void atualizar_lista_produtos();
+void atualizar_slider_preco();
+void alternar_visualizacao();
+void exportar_produtos();
+void mostrar_estatisticas();
 
 // Funções auxiliares
 GtkWidget* criar_card_produto(const char *nome, const char *descricao, 
-                            float preco, float preco_iva);
+                            float preco, float preco_iva, const char *categoria);
 void configurar_colunas_lista(GtkTreeView *treeview);
 gboolean filtrar_produtos(GtkTreeModel *model, GtkTreeIter *iter, gpointer data);
+float calcular_preco_com_iva(float preco);
+
+// Callbacks
+void on_search_changed(GtkSearchEntry *entry, gpointer user_data);
+void on_price_filter_changed(GtkRange *range, gpointer user_data);
+void on_view_toggle(GtkToggleButton *button, gpointer user_data);
+void on_adicionar_produto(GtkButton *button, gpointer user_data);
+void on_editar_produto(GtkButton *button, gpointer user_data);
+void on_excluir_produto(GtkButton *button, gpointer user_data);
+void on_exportar_clicked(GtkButton *button, gpointer user_data);
+void on_stats_clicked(GtkButton *button, gpointer user_data);
 
 #endif // PRODUTOS_VIEW_H

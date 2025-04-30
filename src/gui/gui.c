@@ -25,6 +25,27 @@ static void on_stack_switch(GtkStack *stack, GParamSpec *pspec, gpointer user_da
     }
 }
 
+// Callback para alternar tema
+static void on_theme_switch(GtkSwitch *widget, gboolean state, gpointer user_data) {
+    GtkSettings *settings = gtk_settings_get_default();
+    g_object_set(settings, "gtk-application-prefer-dark-theme", state, NULL);
+    
+    // Aplicar cor do texto dos botões baseado no tema
+    GtkCssProvider *provider = gtk_css_provider_new();
+    const gchar *css = state ? 
+        "button { color: white; }" :
+        "button { color: black; }";
+    gtk_css_provider_load_from_data(provider, css, -1, NULL);
+    
+    gtk_style_context_add_provider_for_screen(
+        gdk_screen_get_default(),
+        GTK_STYLE_PROVIDER(provider),
+        GTK_STYLE_PROVIDER_PRIORITY_APPLICATION
+    );
+    
+    g_object_unref(provider);
+}
+
 // Função para carregar o CSS
 void carregar_css() {
     GtkCssProvider *provider = gtk_css_provider_new();
@@ -38,6 +59,7 @@ void carregar_css() {
     
     g_object_unref(provider);
 }
+
 
 // Função para mostrar notificações
 void mostrar_notificacao(const char *mensagem, const char *tipo) {
@@ -56,12 +78,20 @@ void mostrar_notificacao(const char *mensagem, const char *tipo) {
         gtk_info_bar_set_message_type(GTK_INFO_BAR(infobar), GTK_MESSAGE_INFO);
         gtk_style_context_add_class(gtk_widget_get_style_context(infobar), "success");
     }
+    else if (g_strcmp0(tipo, "aviso") == 0) {
+        gtk_info_bar_set_message_type(GTK_INFO_BAR(infobar), GTK_MESSAGE_WARNING);
+        gtk_style_context_add_class(gtk_widget_get_style_context(infobar), "warning");
+    }
+    else {
+        gtk_info_bar_set_message_type(GTK_INFO_BAR(infobar), GTK_MESSAGE_OTHER);
+        gtk_style_context_add_class(gtk_widget_get_style_context(infobar), "info");
+    }
     
-    gtk_box_pack_start(GTK_BOX(main_gui.main_box), infobar, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(main_gui.notification_area), infobar, FALSE, FALSE, 0);
     gtk_widget_show_all(infobar);
     
-    // Auto-destruir após 3 segundos
-    g_timeout_add_seconds(3, (GSourceFunc)gtk_widget_destroy, infobar);
+    // Auto-destruir após 5 segundos
+    g_timeout_add_seconds(5, (GSourceFunc)gtk_widget_destroy, infobar);
 }
 
 void mostrar_erro(const char *mensagem) {
@@ -72,7 +102,15 @@ void mostrar_sucesso(const char *mensagem) {
     mostrar_notificacao(mensagem, "sucesso");
 }
 
-// Função para mostrar diálogo de confirmação
+void mostrar_aviso(const char *mensagem) {
+    mostrar_notificacao(mensagem, "aviso");
+}
+
+void mostrar_info(const char *mensagem) {
+    mostrar_notificacao(mensagem, "info");
+}
+
+// Funções de diálogo
 void mostrar_dialogo_confirmacao(const char *titulo, const char *mensagem,
                                GCallback callback_sim, gpointer user_data) {
     CustomDialog *dialog = custom_dialog_new(GTK_WINDOW(main_gui.window), titulo);
@@ -89,7 +127,6 @@ void mostrar_dialogo_confirmacao(const char *titulo, const char *mensagem,
     gtk_widget_show_all(dialog->dialog);
 }
 
-// Função para mostrar diálogo de erro
 void mostrar_dialogo_erro(const char *titulo, const char *mensagem) {
     CustomDialog *dialog = custom_dialog_new(GTK_WINDOW(main_gui.window), titulo);
     
@@ -100,6 +137,64 @@ void mostrar_dialogo_erro(const char *titulo, const char *mensagem) {
                                   G_CALLBACK(custom_dialog_destroy), dialog);
     
     gtk_widget_show_all(dialog->dialog);
+}
+
+// Funções de validação
+gboolean validar_numero(const char *texto) {
+    if (texto == NULL || *texto == '\0') return FALSE;
+    
+    for (const char *p = texto; *p != '\0'; p++) {
+        if (!g_ascii_isdigit(*p)) return FALSE;
+    }
+    return TRUE;
+}
+
+gboolean validar_texto_vazio(const char *texto) {
+    return texto != NULL && *texto != '\0';
+}
+
+gboolean validar_preco(const char *texto) {
+    if (texto == NULL || *texto == '\0') return FALSE;
+    
+    char *endptr;
+    float valor = strtof(texto, &endptr);
+    return *endptr == '\0' && valor >= 0;
+}
+
+gboolean validar_telefone(const char *texto) {
+    if (texto == NULL || *texto == '\0') return FALSE;
+    
+    int len = strlen(texto);
+    if (len != 9) return FALSE;
+    
+    return validar_numero(texto);
+}
+
+// Funções de formatação
+char* formatar_moeda(float valor) {
+    static char buffer[32];
+    snprintf(buffer, sizeof(buffer), "%.2f Kz", valor);
+    return buffer;
+}
+
+char* formatar_telefone(const char *telefone) {
+    static char buffer[16];
+    if (strlen(telefone) == 9) {
+        snprintf(buffer, sizeof(buffer), "%c%c%c %c%c%c %c%c%c",
+                telefone[0], telefone[1], telefone[2],
+                telefone[3], telefone[4], telefone[5],
+                telefone[6], telefone[7], telefone[8]);
+    } else {
+        strncpy(buffer, telefone, sizeof(buffer) - 1);
+    }
+    return buffer;
+}
+
+char* formatar_data(const char *data) {
+    static char buffer[32];
+    // TODO: Implementar formatação de data
+    strncpy(buffer, data, sizeof(buffer) - 1);
+    return buffer;
 }
 
 // Função principal para iniciar a interface
@@ -119,9 +214,30 @@ void iniciar_gui(int argc, char *argv[]) {
     main_gui.main_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_container_add(GTK_CONTAINER(main_gui.window), main_gui.main_box);
     
+    // Área de notificações
+    main_gui.notification_area = gtk_box_new(GTK_ORIENTATION_VERTICAL, 4);
+    gtk_box_pack_start(GTK_BOX(main_gui.main_box), 
+                      main_gui.notification_area, FALSE, FALSE, 0);
+    
     // Cabeçalho
     main_gui.header = custom_header_new("Sistema de Gestão", 
                                       "Gerencie seus produtos, clientes e pedidos");
+    
+    // Adicionar switch de tema ao cabeçalho
+    main_gui.theme_switch = gtk_switch_new();
+    g_signal_connect(main_gui.theme_switch, "state-set",
+                    G_CALLBACK(on_theme_switch), NULL);
+    
+    // Criar container para o switch
+    GtkWidget *switch_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 4);
+    GtkWidget *theme_icon = gtk_image_new_from_icon_name("weather-clear-night-symbolic", 
+                                                        GTK_ICON_SIZE_SMALL_TOOLBAR);
+    gtk_box_pack_start(GTK_BOX(switch_box), theme_icon, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(switch_box), main_gui.theme_switch, FALSE, FALSE, 0);
+    
+    // Adicionar ao header através da função apropriada do custom_header
+    custom_header_add_widget(main_gui.header, switch_box);
+    
     gtk_box_pack_start(GTK_BOX(main_gui.main_box), 
                       custom_header_get_widget(main_gui.header), 
                       FALSE, FALSE, 0);

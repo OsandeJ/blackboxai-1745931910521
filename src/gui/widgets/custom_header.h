@@ -19,6 +19,7 @@ void custom_header_add_action_button(CustomHeader *header, const char *icon_name
                                    gpointer user_data);
 void custom_header_set_title(CustomHeader *header, const char *title);
 void custom_header_set_subtitle(CustomHeader *header, const char *subtitle);
+void custom_header_add_widget(CustomHeader *header, GtkWidget *widget);
 GtkWidget* custom_header_get_widget(CustomHeader *header);
 
 #endif // CUSTOM_HEADER_H
